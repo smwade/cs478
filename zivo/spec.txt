@@ -1,0 +1,16 @@
+DataManager
+
+init - takes in 1 fold
+init2 - takes in 2 arff filts
+
+shuffle
+test_train_split
+next_batch
+
+members
+.data
+.labels
+.train_data
+.train_labels
+.test_data
+.test_features
