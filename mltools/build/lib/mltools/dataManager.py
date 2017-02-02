@@ -55,12 +55,12 @@ class DataManager:
 
         f = open(filename)
         for line in f.readlines():
-            line = line.rstrip().upper()
+            line = line.rstrip()
             if len(line) > 0 and line[0] != '%':
                 if not reading_data:
-                    if line.startswith("@RELATION"):
+                    if line.lower().startswith("@relation"):
                         self.dataset_name = line[9:].strip()
-                    elif line.startswith("@ATTRIBUTE"):
+                    elif line.lower().startswith("@attribute"):
                         attr_def = line[10:].strip()
                         if attr_def[0] == "'":
                             attr_def = attr_def[1:]
@@ -73,7 +73,7 @@ class DataManager:
 
                         str_to_enum = {}
                         enum_to_str = {}
-                        if not(attr_def == "REAL" or attr_def == "CONTINUOUS" or attr_def == "INTEGER"):
+                        if not(attr_def.lower() == "real" or attr_def.lower() == "continuous" or attr_def.lower() == "integer"):
                             # attribute is discrete
                             assert attr_def[0] == '{' and attr_def[-1] == '}'
                             attr_def = attr_def[1:-1]
@@ -88,7 +88,7 @@ class DataManager:
                         self.enum_to_str.append(enum_to_str)
                         self.str_to_enum.append(str_to_enum)
 
-                    elif line.startswith("@DATA"):
+                    elif line.lower().startswith("@data"):
                         reading_data = True
 
                 else:
@@ -112,77 +112,6 @@ class DataManager:
         self.data=np.array(rows)
         self.set_labels()
 
-    @staticmethod
-    def load_arff_data(filename):
-        """ Load data from an ARFF file wothout class"""
-        data = []
-        attr_names = []
-        str_to_enum = []
-        enum_to_str = []
-        reading_data = False
-
-        rows = []           # we read data into array of rows, then convert into array of columns
-
-        f = open(filename)
-        for line in f.readlines():
-            line = line.rstrip().upper()
-            if len(line) > 0 and line[0] != '%':
-                if not reading_data:
-                    if line.startswith("@RELATION"):
-                        dataset_name = line[9:].strip()
-                    elif line.startswith("@ATTRIBUTE"):
-                        attr_def = line[10:].strip()
-                        if attr_def[0] == "'":
-                            attr_def = attr_def[1:]
-                            attr_name = attr_def[:attr_def.index("'")]
-                            attr_def = attr_def[attr_def.index("'")+1:].strip()
-                        else:
-                            attr_name, attr_def = attr_def.split()
-
-                        attr_names += [attr_name]
-
-                        str_to_enum_dic = {}
-                        enum_to_str_dic = {}
-                        if not(attr_def == "REAL" or attr_def == "CONTINUOUS" or attr_def == "INTEGER"):
-                            # attribute is discrete
-                            assert attr_def[0] == '{' and attr_def[-1] == '}'
-                            attr_def = attr_def[1:-1]
-                            attr_vals = attr_def.split(",")
-                            val_idx = 0
-                            for val in attr_vals:
-                                val = val.strip()
-                                enum_to_str_dic[val_idx] = val
-                                str_to_enum_dic[val] = val_idx
-                                val_idx += 1
-
-                        enum_to_str.append(enum_to_str_dic)
-                        str_to_enum.append(str_to_enum_dic)
-
-                    elif line.startswith("@DATA"):
-                        reading_data = True
-
-                else:
-                    # reading data
-                    row = []
-                    val_idx = 0
-                    # print("{}".format(line))
-                    vals = line.split(",")
-                    for val in vals:
-                        val = val.strip()
-                        if not val:
-                            raise Exception("Missing data element in row with data '{}'".format(line))
-                        else:
-                            row += [float(MISSING if val == "?" else str_to_enum[val_idx].get(val, val))]
-
-                        val_idx += 1
-
-                    rows += [row]
-
-        f.close()
-        data = np.array(rows)
-        return data
-        
-
     @property
     def num_rows(self):
         """Get the number of rows in the matrix"""
@@ -193,7 +122,7 @@ class DataManager:
         """Get the number of columns (or attributes) in the matrix"""
         return len(self.attr_names)
 
-    
+
     def attr_name(self, col):
         """Get the name of the specified attribute"""
         return self.attr_names[col]
@@ -220,7 +149,7 @@ class DataManager:
         self.data = self.data[idx]
         self.labels = self.labels[idx]
 
-     
+
     def mean(self):
         return np.mean(self.data, axis=0)
 
@@ -254,7 +183,7 @@ class DataManager:
             mostfrequent = np.where(counts > oldcounts, score, oldmostfreq)
             oldcounts = np.maximum(counts, oldcounts)
             oldmostfreq = mostfrequent
-        
+
         return mostfrequent
 
     def min_max_normalize(self):
@@ -278,8 +207,8 @@ class DataManager:
                     v = self.data[j, i]
                     if v != self.MISSING:
                         self.data[j, i] = (v - mu) / std
-                        
-                       
+
+
 
     def __str__(self):
         outString = ""
