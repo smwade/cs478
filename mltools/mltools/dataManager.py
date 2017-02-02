@@ -16,7 +16,7 @@ class DataManager:
     def set_data(self, data, labels):
         """Initialize the matrix with a portion of another matrix"""
         self.data = data
-        self.labels = lables
+        self.labels = labels
 
     def add_data(self, new_data, new_labels):
         """Appends a copy of the specified portion of a matrix to this matrix"""
@@ -274,7 +274,6 @@ class DataManager:
             if self.value_count(i) == 0:     # is continuous
                 mu = self.column_mean(i)
                 std = self.data[:,i].std()
-                print mu, std
                 for j in range(self.num_rows):
                     v = self.data[j, i]
                     if v != self.MISSING:
