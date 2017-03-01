@@ -67,7 +67,6 @@ class DataManager:
                             attr_name = attr_def[:attr_def.index("'")]
                             attr_def = attr_def[attr_def.index("'")+1:].strip()
                         else:
-                            attr_def = attr_def.replace(', ',',')
                             attr_name, attr_def = attr_def.split()
 
                         self.attr_names += [attr_name]
@@ -169,10 +168,6 @@ class DataManager:
         a = np.ma.masked_equal(self.data[:,col], self.MISSING).compressed()
         return np.max(a)
 
-    def drop_column(self, col):
-        self.data = np.delete(self.data, col, axis=1)
-        del self.attr_names[col]
-
     def most_common_value(self, col):
         """Get the most common value in the specified column"""
         a = np.ma.masked_equal(self.data[:,col], self.MISSING).compressed()
@@ -193,31 +188,25 @@ class DataManager:
 
     def min_max_normalize(self):
         """Normalize each column of continuous values"""
-        try:
-            for i in range(self.num_cols):
-                if self.value_count(i) == 0:     # is continuous
-                    min_val = self.column_min(i)
-                    max_val = self.column_max(i)
-                    for j in range(self.num_rows):
-                        v = self.data[j, i]
-                        if v != self.MISSING:
-                            self.data[j, i] = (v - min_val)/(max_val - min_val)
-        except:
-            pass
+        for i in range(self.num_cols):
+            if self.value_count(i) == 0:     # is continuous
+                min_val = self.column_min(i)
+                max_val = self.column_max(i)
+                for j in range(self.num_rows):
+                    v = self.data[j, i]
+                    if v != self.MISSING:
+                        self.data[j, i] = (v - min_val)/(max_val - min_val)
 
     def normalize(self):
         """Normalize each column of continuous values"""
-        try:
-            for i in range(self.num_cols):
-                if self.value_count(i) == 0:     # is continuous
-                    mu = self.column_mean(i)
-                    std = self.data[:,i].std()
-                    for j in range(self.num_rows):
-                        v = self.data[j, i]
-                        if v != self.MISSING:
-                            self.data[j, i] = (v - mu) / std
-        except:
-            pass
+        for i in range(self.num_cols):
+            if self.value_count(i) == 0:     # is continuous
+                mu = self.column_mean(i)
+                std = self.data[:,i].std()
+                for j in range(self.num_rows):
+                    v = self.data[j, i]
+                    if v != self.MISSING:
+                        self.data[j, i] = (v - mu) / std
 
 
 
