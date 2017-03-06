@@ -68,6 +68,8 @@ class DataManager:
                             attr_def = attr_def[attr_def.index("'")+1:].strip()
                         else:
                             attr_def = attr_def.replace(', ',',')
+                            attr_def = attr_def.replace('{ ','{')
+                            attr_def = attr_def.replace(' }','}')
                             attr_name, attr_def = attr_def.split()
 
                         self.attr_names += [attr_name]
@@ -144,8 +146,10 @@ class DataManager:
         """
         return len(self.enum_to_str[col]) if len(self.enum_to_str) > 0 else 0
 
-    def shuffle(self):
+    def shuffle(self, seed=None):
         """Shuffle the row order. If a buddy Matrix is provided, it will be shuffled in the same order."""
+        if seed:
+            np.random.seed(seed)
         idx = np.random.permutation(self.num_rows)
         self.data = self.data[idx]
         self.labels = self.labels[idx]
@@ -218,6 +222,17 @@ class DataManager:
                             self.data[j, i] = (v - mu) / std
         except:
             pass
+
+    def is_nominal_variable(self):
+        """ Returns list of true if nominal and false if continuous. """
+        values = []
+        for x in self.enum_to_str:
+            if x == {}:
+                values.append(False)
+            else:
+                values.append(True)
+        return values
+
 
 
 
