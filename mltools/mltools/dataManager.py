@@ -1,7 +1,8 @@
 import numpy as np
 
 class DataManager:
-    MISSING = float("infinity")
+    #MISSING = float("infinity")
+    MISSING = np.NaN
 
     def __init__(self, arff=None):
         """
@@ -220,6 +221,9 @@ class DataManager:
                         v = self.data[j, i]
                         if v != self.MISSING:
                             self.data[j, i] = (v - mu) / std
+                        else:
+                            self.data[j, i] = mu
+
         except:
             pass
 
