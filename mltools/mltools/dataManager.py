@@ -29,7 +29,7 @@ class DataManager:
         self.data = self.data[:,:-1]
 
     def test_train_split(self, ratio=.8):
-        self.shuffle()
+        #self.shuffle()
         split_point = int(self.num_rows * ratio)
         x_train = self.data[:split_point,:]
         x_test = self.data[split_point:,:]
